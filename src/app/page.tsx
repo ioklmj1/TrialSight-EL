@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useFilterState } from '@/hooks/useFilterState';
 import { useStudySearch } from '@/hooks/useStudySearch';
 import { useSiteAggregation } from '@/hooks/useSiteAggregation';
@@ -35,7 +35,21 @@ function HomeContent() {
   // API reads from committed URL params (not local draft)
   const { studies, totalCount, isLoading, isLoadingMore, hasMore, loadMore, shouldFetch } =
     useStudySearch(urlFilters);
-  const sites = useSiteAggregation(studies);
+  const allSites = useSiteAggregation(studies);
+
+  // Post-filter sites by location when country/city filters are active.
+  // The CT.gov API returns entire studies (all locations) when any location matches,
+  // so we need to filter client-side to only show sites in the requested location.
+  const sites = useMemo(() => {
+    const country = urlFilters.country.toLowerCase().trim();
+    const city = urlFilters.city.toLowerCase().trim();
+    if (!country && !city) return allSites;
+    return allSites.filter((site) => {
+      if (country && !(site.country || '').toLowerCase().includes(country)) return false;
+      if (city && !(site.city || '').toLowerCase().includes(city)) return false;
+      return true;
+    });
+  }, [allSites, urlFilters.country, urlFilters.city]);
 
   const selectedSite = selectedSiteId
     ? sites.find((s) => s.id === selectedSiteId) ?? null
