@@ -12,7 +12,7 @@ export function buildSearchUrl(
   const params = new URLSearchParams();
 
   if (filters.searchTerm) params.set('q', filters.searchTerm);
-  if (filters.condition) params.set('cond', filters.condition);
+  if (filters.conditions.length > 0) params.set('cond', filters.conditions.join(','));
   const locationParts = [filters.country, filters.city].filter(Boolean);
   if (locationParts.length > 0) params.set('locn', locationParts.join(', '));
   if (filters.sponsor) params.set('spons', filters.sponsor);

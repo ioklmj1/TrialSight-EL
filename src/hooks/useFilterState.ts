@@ -12,7 +12,7 @@ export function useFilterState() {
 
   const filters: FilterState = useMemo(() => ({
     searchTerm: searchParams.get('q') ?? '',
-    condition: searchParams.get('cond') ?? '',
+    conditions: (searchParams.get('cond')?.split(',').filter(Boolean) ?? []) as string[],
     statuses: (searchParams.get('status')?.split(',').filter(Boolean) ?? []) as OverallStatus[],
     phases: (searchParams.get('phase')?.split(',').filter(Boolean) ?? []) as Phase[],
     sponsor: searchParams.get('spons') ?? '',
@@ -29,7 +29,7 @@ export function useFilterState() {
     const params = new URLSearchParams();
 
     if (newFilters.searchTerm) params.set('q', newFilters.searchTerm);
-    if (newFilters.condition) params.set('cond', newFilters.condition);
+    if (newFilters.conditions.length > 0) params.set('cond', newFilters.conditions.join(','));
     if (newFilters.statuses.length > 0) params.set('status', newFilters.statuses.join(','));
     if (newFilters.phases.length > 0) params.set('phase', newFilters.phases.join(','));
     if (newFilters.sponsor) params.set('spons', newFilters.sponsor);

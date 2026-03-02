@@ -2,7 +2,7 @@ import type { OverallStatus, Phase } from './study';
 
 export interface FilterState {
   searchTerm: string;
-  condition: string;
+  conditions: string[];
   statuses: OverallStatus[];
   phases: Phase[];
   sponsor: string;
@@ -16,7 +16,7 @@ export interface FilterState {
 
 export const EMPTY_FILTERS: FilterState = {
   searchTerm: '',
-  condition: '',
+  conditions: [],
   statuses: [],
   phases: [],
   sponsor: '',

@@ -31,7 +31,7 @@ export default function FilterBar({
   resultCount,
 }: FilterBarProps) {
   const hasActiveFilters =
-    filters.condition !== '' ||
+    filters.conditions.length > 0 ||
     filters.statuses.length > 0 ||
     filters.phases.length > 0 ||
     filters.sponsor !== '' ||
@@ -49,8 +49,8 @@ export default function FilterBar({
         <div className="flex items-center gap-2 flex-wrap">
           {/* Dropdowns */}
           <ConditionFilter
-            value={filters.condition}
-            onChange={(v) => onFilterChange('condition', v)}
+            value={filters.conditions}
+            onChange={(v) => onFilterChange('conditions', v)}
           />
           <StatusFilter
             value={filters.statuses}
@@ -112,7 +112,12 @@ export default function FilterBar({
           <FilterChips
             filters={filters}
             onRemove={(key, value) => {
-              if (key === 'statuses' && value) {
+              if (key === 'conditions' && value) {
+                onFilterChange(
+                  'conditions',
+                  filters.conditions.filter((c) => c !== value)
+                );
+              } else if (key === 'statuses' && value) {
                 onFilterChange(
                   'statuses',
                   filters.statuses.filter((s) => s !== value)
@@ -126,7 +131,8 @@ export default function FilterBar({
                 onFilterChange('dateFrom', '');
                 onFilterChange('dateTo', '');
               } else {
-                onFilterChange(key, key === 'statuses' || key === 'phases' ? [] : '');
+                const arrayKeys: (keyof FilterState)[] = ['conditions', 'statuses', 'phases'];
+                onFilterChange(key, arrayKeys.includes(key) ? [] : '');
               }
             }}
           />

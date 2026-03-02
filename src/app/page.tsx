@@ -54,22 +54,10 @@ function HomeContent() {
     setLocalFilters(prev => ({ ...prev, [key]: value }));
   }, []);
 
-  // For dropdown/checkbox filters: update local AND immediately commit
-  const updateAndCommit = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-    const updated = { ...localRef.current, [key]: value };
-    setLocalFilters(updated);
-    commitFilters(updated);
-  }, [commitFilters]);
-
+  // All filters update local draft state only — committed on explicit Search
   const handleFilterChange = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-    // Dropdowns and checkboxes commit immediately
-    const immediateKeys: (keyof FilterState)[] = ['condition', 'statuses', 'phases'];
-    if (immediateKeys.includes(key)) {
-      updateAndCommit(key, value);
-    } else {
-      updateLocal(key, value);
-    }
-  }, [updateAndCommit, updateLocal]);
+    updateLocal(key, value);
+  }, [updateLocal]);
 
   const handleSiteSelect = useCallback((siteId: string) => {
     setSelectedSiteId(siteId);

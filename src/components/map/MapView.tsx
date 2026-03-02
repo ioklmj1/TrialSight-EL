@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
+import { useMemo } from 'react';
 import { MAP_DEFAULTS } from '@/lib/constants';
 import type { Site } from '@/types/site';
 import SiteMarker from './SiteMarker';
@@ -26,6 +27,12 @@ interface MapViewProps {
 }
 
 export default function MapView({ sites, selectedSiteId, onSiteSelect }: MapViewProps) {
+  // Generate a stable key from site IDs so the cluster group fully re-mounts
+  // when the underlying data changes (filters applied, new search, etc.)
+  const clusterKey = useMemo(() => {
+    return sites.map((s) => s.id).join('|');
+  }, [sites]);
+
   return (
     <MapContainer
       center={MAP_DEFAULTS.center}
@@ -38,6 +45,7 @@ export default function MapView({ sites, selectedSiteId, onSiteSelect }: MapView
         url={MAP_DEFAULTS.tileUrl}
       />
       <MarkerClusterGroup
+        key={clusterKey}
         chunkedLoading
         maxClusterRadius={80}
         spiderfyOnMaxZoom={false}

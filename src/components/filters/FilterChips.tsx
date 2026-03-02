@@ -11,8 +11,12 @@ interface FilterChipsProps {
 export default function FilterChips({ filters, onRemove }: FilterChipsProps) {
   const chips: { key: keyof FilterState; label: string; value?: string }[] = [];
 
-  if (filters.condition) {
-    chips.push({ key: 'condition', label: `Condition: ${filters.condition}` });
+  for (const cond of filters.conditions) {
+    chips.push({
+      key: 'conditions',
+      label: cond,
+      value: cond,
+    });
   }
 
   for (const status of filters.statuses) {

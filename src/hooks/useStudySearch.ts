@@ -9,7 +9,7 @@ function buildSearchUrl(filters: FilterState, pageToken?: string): string {
   const params = new URLSearchParams();
 
   if (filters.searchTerm) params.set('q', filters.searchTerm);
-  if (filters.condition) params.set('cond', filters.condition);
+  if (filters.conditions.length > 0) params.set('cond', filters.conditions.join(','));
   if (filters.statuses.length > 0) params.set('status', filters.statuses.join(','));
   if (filters.phases.length > 0) params.set('phase', filters.phases.join(','));
   if (filters.sponsor) params.set('spons', filters.sponsor);
@@ -40,7 +40,7 @@ const fetcher = async (url: string): Promise<StudySearchResponse> => {
 function hasAnyFilter(filters: FilterState): boolean {
   return Boolean(
     filters.searchTerm ||
-    filters.condition ||
+    filters.conditions.length > 0 ||
     filters.statuses.length > 0 ||
     filters.phases.length > 0 ||
     filters.sponsor ||
