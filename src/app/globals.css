@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FAFAF5;
+  --foreground: #1E293B;
+  --surface: #F5F5F0;
+  --border: #E8E5DE;
+  --accent: #0D9488;
+  --accent-hover: #0F766E;
+  --muted: #64748B;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-muted: var(--muted);
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Leaflet overrides for our theme */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: var(--surface);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+}
+
+.leaflet-popup-content {
+  margin: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.leaflet-popup-tip {
+  box-shadow: none;
+}
+
+/* Cluster marker styles — override default MarkerCluster colors with teal theme */
+.marker-cluster {
+  background-clip: padding-box;
+  border-radius: 20px;
+}
+.marker-cluster div {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  border-radius: 15px;
+  font: 12px 'Inter', system-ui, sans-serif;
+}
+.marker-cluster span {
+  line-height: 30px;
+}
+.marker-cluster-small {
+  background-color: rgba(13, 148, 136, 0.2) !important;
+}
+.marker-cluster-small div {
+  background-color: rgba(13, 148, 136, 0.65) !important;
+  color: white;
+  font-weight: 600;
+}
+.marker-cluster-medium {
+  background-color: rgba(13, 148, 136, 0.3) !important;
+}
+.marker-cluster-medium div {
+  background-color: rgba(13, 148, 136, 0.75) !important;
+  color: white;
+  font-weight: 600;
+}
+.marker-cluster-large {
+  background-color: rgba(13, 148, 136, 0.4) !important;
+}
+.marker-cluster-large div {
+  background-color: rgba(13, 148, 136, 0.9) !important;
+  color: white;
+  font-weight: 600;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
