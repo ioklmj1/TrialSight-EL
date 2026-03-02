@@ -122,7 +122,7 @@ function HomeContent() {
         />
       }
     >
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-hidden">
         {!shouldFetch && !hasActiveFilters ? (
           <div className="flex items-center justify-center h-full">
             <EmptyState
@@ -156,13 +156,13 @@ function HomeContent() {
             onSiteSelect={handleSiteSelect}
           />
         )}
-      </div>
 
-      <SiteDetailPanel
-        site={selectedSite}
-        isOpen={selectedSite !== null}
-        onClose={() => setSelectedSiteId(null)}
-      />
+        <SiteDetailPanel
+          site={selectedSite}
+          isOpen={selectedSite !== null}
+          onClose={() => setSelectedSiteId(null)}
+        />
+      </div>
     </AppShell>
   );
 }

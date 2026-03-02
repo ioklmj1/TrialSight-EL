@@ -48,9 +48,10 @@ export default function MapView({ sites, selectedSiteId, onSiteSelect }: MapView
         key={clusterKey}
         chunkedLoading
         maxClusterRadius={80}
-        spiderfyOnMaxZoom={false}
+        spiderfyOnMaxZoom={true}
         zoomToBoundsOnClick={true}
         showCoverageOnHover={false}
+        spiderfyDistanceMultiplier={2}
       >
         {sites.map((site) => (
           <SiteMarker key={site.id} site={site} onSelect={onSiteSelect} />
