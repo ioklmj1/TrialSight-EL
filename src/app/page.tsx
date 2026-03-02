@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useCallback, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useFilterState } from '@/hooks/useFilterState';
 import { useStudySearch } from '@/hooks/useStudySearch';
 import { useSiteAggregation } from '@/hooks/useSiteAggregation';
-import { useDebounce } from '@/hooks/useDebounce';
 import type { FilterState } from '@/types/filters';
+import { EMPTY_FILTERS } from '@/types/filters';
 
 import AppShell from '@/components/layout/AppShell';
 import Header from '@/components/layout/Header';
@@ -17,75 +17,103 @@ import SiteDetailPanel from '@/components/detail/SiteDetailPanel';
 import EmptyState from '@/components/ui/EmptyState';
 
 function HomeContent() {
-  const { filters, setFilter, clearAll, hasActiveFilters } = useFilterState();
+  const { filters: urlFilters, commitFilters, clearAll, hasActiveFilters } = useFilterState();
   const [view, setView] = useState<'list' | 'map'>('list');
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [searchMode, setSearchMode] = useState<'sites' | 'pi'>('sites');
 
-  // Debounce text-based filters for API calls
-  const debouncedFilters: FilterState = {
-    ...filters,
-    searchTerm: useDebounce(filters.searchTerm, 400),
-    sponsor: useDebounce(filters.sponsor, 400),
-    intervention: useDebounce(filters.intervention, 400),
-    location: useDebounce(filters.location, 400),
-    piName: useDebounce(filters.piName, 400),
-    dateFrom: useDebounce(filters.dateFrom, 600),
-    dateTo: useDebounce(filters.dateTo, 600),
-  };
+  // Local "draft" filter state — only synced to URL on explicit Search
+  const [localFilters, setLocalFilters] = useState<FilterState>(urlFilters);
+  const localRef = useRef(localFilters);
+  localRef.current = localFilters;
 
+  // Sync local state when URL params change (browser back, clearAll, etc.)
+  useEffect(() => {
+    setLocalFilters(urlFilters);
+  }, [urlFilters]);
+
+  // API reads from committed URL params (not local draft)
   const { studies, totalCount, isLoading, isLoadingMore, hasMore, loadMore, shouldFetch } =
-    useStudySearch(debouncedFilters);
+    useStudySearch(urlFilters);
   const sites = useSiteAggregation(studies);
 
   const selectedSite = selectedSiteId
     ? sites.find((s) => s.id === selectedSiteId) ?? null
     : null;
 
+  // Commit current local filters to URL (triggers API call)
+  const commitSearch = useCallback((overrides?: Partial<FilterState>) => {
+    const toCommit = overrides
+      ? { ...localRef.current, ...overrides }
+      : localRef.current;
+    commitFilters(toCommit);
+  }, [commitFilters]);
+
+  // Update a local filter value without triggering API
+  const updateLocal = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    setLocalFilters(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  // For dropdown/checkbox filters: update local AND immediately commit
+  const updateAndCommit = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    const updated = { ...localRef.current, [key]: value };
+    setLocalFilters(updated);
+    commitFilters(updated);
+  }, [commitFilters]);
+
+  const handleFilterChange = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    // Dropdowns and checkboxes commit immediately
+    const immediateKeys: (keyof FilterState)[] = ['condition', 'statuses', 'phases'];
+    if (immediateKeys.includes(key)) {
+      updateAndCommit(key, value);
+    } else {
+      updateLocal(key, value);
+    }
+  }, [updateAndCommit, updateLocal]);
+
   const handleSiteSelect = useCallback((siteId: string) => {
     setSelectedSiteId(siteId);
   }, []);
 
-  const handleSearchChange = useCallback(
-    (term: string) => {
-      if (searchMode === 'pi') {
-        setFilter('piName', term);
-      } else {
-        setFilter('searchTerm', term);
-      }
-    },
-    [setFilter, searchMode]
-  );
+  const handleSearchModeChange = useCallback((mode: 'sites' | 'pi') => {
+    setSearchMode(mode);
+    if (mode === 'pi') {
+      updateLocal('searchTerm', '');
+    } else {
+      updateLocal('piName', '');
+    }
+  }, [updateLocal]);
 
-  const handleSearchModeChange = useCallback(
-    (mode: 'sites' | 'pi') => {
-      setSearchMode(mode);
-      if (mode === 'pi') {
-        setFilter('searchTerm', '');
-      } else {
-        setFilter('piName', '');
-      }
-    },
-    [setFilter]
-  );
+  const handleClearAll = useCallback(() => {
+    setLocalFilters(EMPTY_FILTERS);
+    clearAll();
+  }, [clearAll]);
 
   return (
     <AppShell
       header={
         <Header
-          searchTerm={searchMode === 'pi' ? filters.piName : filters.searchTerm}
-          onSearchChange={handleSearchChange}
+          searchTerm={searchMode === 'pi' ? localFilters.piName : localFilters.searchTerm}
+          onSearchChange={(term) => {
+            if (searchMode === 'pi') {
+              updateLocal('piName', term);
+            } else {
+              updateLocal('searchTerm', term);
+            }
+          }}
+          onSearch={() => commitSearch()}
           searchMode={searchMode}
           onSearchModeChange={handleSearchModeChange}
-          piName={filters.piName}
-          onPINameChange={(name) => setFilter('piName', name)}
+          piName={localFilters.piName}
+          onPINameChange={(name) => updateLocal('piName', name)}
         />
       }
       filterBar={
         <FilterBar
-          filters={filters}
-          onFilterChange={(key, value) => setFilter(key, value)}
-          onClearAll={clearAll}
+          filters={localFilters}
+          onFilterChange={handleFilterChange}
+          onClearAll={handleClearAll}
+          onSearch={() => commitSearch()}
           view={view}
           onViewChange={setView}
           resultCount={sites.length}

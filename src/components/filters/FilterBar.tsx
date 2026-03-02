@@ -15,6 +15,7 @@ interface FilterBarProps {
   filters: FilterState;
   onFilterChange: (key: keyof FilterState, value: any) => void;
   onClearAll: () => void;
+  onSearch: () => void;
   view: 'list' | 'map';
   onViewChange: (view: 'list' | 'map') => void;
   resultCount: number;
@@ -24,6 +25,7 @@ export default function FilterBar({
   filters,
   onFilterChange,
   onClearAll,
+  onSearch,
   view,
   onViewChange,
   resultCount,
@@ -34,7 +36,8 @@ export default function FilterBar({
     filters.phases.length > 0 ||
     filters.sponsor !== '' ||
     filters.intervention !== '' ||
-    filters.location !== '' ||
+    filters.country !== '' ||
+    filters.city !== '' ||
     filters.dateFrom !== '' ||
     filters.dateTo !== '' ||
     filters.piName !== '';
@@ -60,14 +63,18 @@ export default function FilterBar({
           <SponsorFilter
             value={filters.sponsor}
             onChange={(v) => onFilterChange('sponsor', v)}
+            onCommit={onSearch}
           />
           <InterventionFilter
             value={filters.intervention}
             onChange={(v) => onFilterChange('intervention', v)}
           />
           <LocationFilter
-            value={filters.location}
-            onChange={(v) => onFilterChange('location', v)}
+            country={filters.country}
+            city={filters.city}
+            onCountryChange={(v) => onFilterChange('country', v)}
+            onCityChange={(v) => onFilterChange('city', v)}
+            onCommit={onSearch}
           />
           <DateRangeFilter
             fromValue={filters.dateFrom}

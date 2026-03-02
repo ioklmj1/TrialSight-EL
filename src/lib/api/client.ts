@@ -13,7 +13,8 @@ export function buildSearchUrl(
 
   if (filters.searchTerm) params.set('q', filters.searchTerm);
   if (filters.condition) params.set('cond', filters.condition);
-  if (filters.location) params.set('locn', filters.location);
+  const locationParts = [filters.country, filters.city].filter(Boolean);
+  if (locationParts.length > 0) params.set('locn', locationParts.join(', '));
   if (filters.sponsor) params.set('spons', filters.sponsor);
   if (filters.intervention) params.set('intr', filters.intervention);
   if (filters.piName) params.set('pi', filters.piName);

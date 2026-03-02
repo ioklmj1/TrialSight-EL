@@ -39,8 +39,9 @@ export default function MapView({ sites, selectedSiteId, onSiteSelect }: MapView
       />
       <MarkerClusterGroup
         chunkedLoading
-        maxClusterRadius={50}
-        spiderfyOnMaxZoom
+        maxClusterRadius={80}
+        spiderfyOnMaxZoom={false}
+        zoomToBoundsOnClick={true}
         showCoverageOnHover={false}
       >
         {sites.map((site) => (

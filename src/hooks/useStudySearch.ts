@@ -14,7 +14,11 @@ function buildSearchUrl(filters: FilterState, pageToken?: string): string {
   if (filters.phases.length > 0) params.set('phase', filters.phases.join(','));
   if (filters.sponsor) params.set('spons', filters.sponsor);
   if (filters.intervention) params.set('intr', filters.intervention);
-  if (filters.location) params.set('locn', filters.location);
+
+  // Combine country and city for the API location parameter
+  const locationParts = [filters.country, filters.city].filter(Boolean);
+  if (locationParts.length > 0) params.set('locn', locationParts.join(', '));
+
   if (filters.dateFrom) params.set('from', filters.dateFrom);
   if (filters.dateTo) params.set('to', filters.dateTo);
   if (filters.piName) params.set('pi', filters.piName);
@@ -41,7 +45,8 @@ function hasAnyFilter(filters: FilterState): boolean {
     filters.phases.length > 0 ||
     filters.sponsor ||
     filters.intervention ||
-    filters.location ||
+    filters.country ||
+    filters.city ||
     filters.dateFrom ||
     filters.dateTo ||
     filters.piName

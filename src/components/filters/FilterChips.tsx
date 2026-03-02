@@ -39,8 +39,12 @@ export default function FilterChips({ filters, onRemove }: FilterChipsProps) {
     chips.push({ key: 'intervention', label: `Intervention: ${filters.intervention}` });
   }
 
-  if (filters.location) {
-    chips.push({ key: 'location', label: `Location: ${filters.location}` });
+  if (filters.country) {
+    chips.push({ key: 'country', label: `Country: ${filters.country}` });
+  }
+
+  if (filters.city) {
+    chips.push({ key: 'city', label: `City: ${filters.city}` });
   }
 
   if (filters.dateFrom || filters.dateTo) {

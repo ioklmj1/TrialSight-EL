@@ -36,7 +36,7 @@ export default function Drawer({ isOpen, onClose, title, children }: DrawerProps
       {/* Backdrop */}
       <div
         className={`
-          fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px]
+          fixed inset-0 z-[9998] bg-black/30 backdrop-blur-[2px]
           transition-opacity duration-300
           ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}
@@ -47,7 +47,7 @@ export default function Drawer({ isOpen, onClose, title, children }: DrawerProps
       {/* Panel */}
       <div
         className={`
-          fixed top-0 right-0 z-50 h-full
+          fixed top-0 right-0 z-[9999] h-full
           w-full sm:w-[480px]
           bg-[#FAFAF5] shadow-2xl shadow-black/10
           transition-transform duration-300 ease-out

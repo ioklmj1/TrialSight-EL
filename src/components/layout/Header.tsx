@@ -3,6 +3,7 @@
 interface HeaderProps {
   searchTerm: string;
   onSearchChange: (term: string) => void;
+  onSearch: () => void;
   searchMode: 'sites' | 'pi';
   onSearchModeChange: (mode: 'sites' | 'pi') => void;
   piName: string;
@@ -12,11 +13,17 @@ interface HeaderProps {
 export default function Header({
   searchTerm,
   onSearchChange,
+  onSearch,
   searchMode,
   onSearchModeChange,
-  piName,
-  onPINameChange,
 }: HeaderProps) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onSearch();
+    }
+  };
+
   return (
     <header className="sticky top-0 z-30 bg-[#FAFAF5] border-b border-[#E8E5DE]">
       <div className="flex items-center gap-4 px-5 py-3 max-w-[1600px] mx-auto">
@@ -33,8 +40,8 @@ export default function Header({
 
         {/* Search Bar */}
         <div className="flex-1 max-w-xl mx-auto">
-          {searchMode === 'sites' ? (
-            <div className="relative">
+          <div className="relative flex items-center gap-2">
+            <div className="relative flex-1">
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]"
                 fill="none"
@@ -42,13 +49,18 @@ export default function Header({
                 stroke="currentColor"
                 strokeWidth={2}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                {searchMode === 'pi' ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                )}
               </svg>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Search clinical trial sites..."
+                onKeyDown={handleKeyDown}
+                placeholder={searchMode === 'pi' ? 'Search by Principal Investigator name...' : 'Search clinical trial sites...'}
                 className="w-full pl-9 pr-4 py-2 rounded-lg bg-white border border-[#E8E5DE] text-sm text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] transition-all"
               />
               {searchTerm && (
@@ -63,37 +75,15 @@ export default function Header({
                 </button>
               )}
             </div>
-          ) : (
-            <div className="relative">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-              <input
-                type="text"
-                value={piName}
-                onChange={(e) => onPINameChange(e.target.value)}
-                placeholder="Search by Principal Investigator name..."
-                className="w-full pl-9 pr-4 py-2 rounded-lg bg-white border border-[#E8E5DE] text-sm text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] transition-all"
-              />
-              {piName && (
-                <button
-                  type="button"
-                  onClick={() => onPINameChange('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B] cursor-pointer"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          )}
+            {/* Search Button */}
+            <button
+              type="button"
+              onClick={onSearch}
+              className="shrink-0 px-4 py-2 rounded-lg bg-[#0D9488] text-white text-sm font-medium hover:bg-[#0F766E] transition-colors cursor-pointer"
+            >
+              Search
+            </button>
+          </div>
         </div>
 
         {/* Search Mode Toggle */}

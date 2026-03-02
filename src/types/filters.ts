@@ -7,7 +7,8 @@ export interface FilterState {
   phases: Phase[];
   sponsor: string;
   intervention: string;
-  location: string;
+  country: string;
+  city: string;
   dateFrom: string;
   dateTo: string;
   piName: string;
@@ -20,7 +21,8 @@ export const EMPTY_FILTERS: FilterState = {
   phases: [],
   sponsor: '',
   intervention: '',
-  location: '',
+  country: '',
+  city: '',
   dateFrom: '',
   dateTo: '',
   piName: '',
@@ -33,7 +35,8 @@ export type FilterSearchParams = {
   phase?: string;
   spons?: string;
   intr?: string;
-  locn?: string;
+  ctry?: string;
+  city?: string;
   from?: string;
   to?: string;
   pi?: string;
